@@ -25,7 +25,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7581591292504702262}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 552.5, y: 272.5, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 6854962848906187395}
@@ -44,9 +44,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c7dfcb7a4adc59f4298c01b19f3d1996, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MainRenderer: {fileID: 5722549798709651948}
-  Size: {x: 1, y: 1}
-  MainColor: {r: 0, g: 0, b: 0, a: 0}
+  mainRenderer: {fileID: 5722549798709651948}
+  size: {x: 1, y: 1}
+  mainColor: {r: 0, g: 0, b: 0, a: 0}
+  tr: {fileID: 4259396283775346339}
+  position: {x: 0, y: 0, z: 0}
 --- !u!1001 &6389201703965619560
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -64,7 +66,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e3e0719ff6666a047a3513595882c17f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.049999997
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e3e0719ff6666a047a3513595882c17f, type: 3}
       propertyPath: m_LocalPosition.z

@@ -7,8 +7,10 @@ public class BuildingsGrid : MonoBehaviour
     private Building[,] _grid;
     private Building _flyingBuilding;
     private Camera _mainCamera;
-    [FormerlySerializedAs("ObjectsTilemap")] public GameObject objectsTilemap;
-    
+
+    [FormerlySerializedAs("ObjectsTilemap")]
+    public GameObject objectsTilemap;
+
 
     void Awake()
     {
@@ -26,46 +28,73 @@ public class BuildingsGrid : MonoBehaviour
 
     void Update()
     {
-        if (_flyingBuilding != null)
+        if (_flyingBuilding == null) return;
+        var groundPlane = new Plane(Vector3.up, Vector3.zero);
+        Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
+        
+        
+        if (!groundPlane.Raycast(ray, out var position)) return;
+        Vector3 mousePos = ray.GetPoint(position);
+        
+        var x = Mathf.RoundToInt(mousePos.x);
+        var y = Mathf.RoundToInt(mousePos.z);
+
+        var available = CanPlaceBuilding(x, y);
+
+        if (!Input.GetMouseButton(1))
         {
-            var groundPlane = new Plane(Vector3.up, Vector3.zero);
-            Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
+            MoveBuilding(mousePos);
+            _flyingBuilding.SetTransparent(available);
+        }
+        if (available && Input.GetMouseButton(1))
+        {
+            RotateBuilding(mousePos);
+        }
 
-            
-            if (groundPlane.Raycast(ray, out float position))
+        if (available && Input.GetMouseButton(0))
+        {
+            PlaceFlyingBuilding(x, y);
+        }
+    }
+
+    private void MoveBuilding(Vector3 mousePos)
+    {
+        var x = Mathf.RoundToInt(mousePos.x);
+        var z = Mathf.RoundToInt(mousePos.z);
+        _flyingBuilding.transform.position = new Vector3(x, 0, z);
+    }
+
+    private void RotateBuilding(Vector3 mousePos)
+    {
+        Transform tr;
+        (tr = _flyingBuilding.transform).LookAt(new Vector3(mousePos.x, _flyingBuilding.transform.position.y, mousePos.z));
+        var rot = tr.rotation;
+        int y = Mathf.FloorToInt(rot.eulerAngles.y);
+        y = (y > 45 && y <= 135) ? 90 : y;
+        y = (y > 135 && y <= 225) ? 180 : y;
+        y = (y > 215 && y <= 315) ? 270 : y;
+        y = (y > 315 || y <= 45) ? 0 : y;
+        _flyingBuilding.transform.rotation = Quaternion.Euler(rot.eulerAngles.x, y, rot.eulerAngles.z);
+    }
+
+    private bool CanPlaceBuilding(int x, int y)
+    {
+        var available = x >= 0 && x <= gridSize.x - _flyingBuilding.size.x && y >= 0 &&
+                        y <= gridSize.y - _flyingBuilding.size.y;
+        available = available && !IsPlaceTaken(x, y);
+        Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out var hit))
+        {
+            var obj = hit.transform.gameObject;
+            if (obj.transform.parent != null && obj.transform.parent.gameObject.tag.Contains("Ground"))
             {
-                Vector3 worldPosition = ray.GetPoint(position);
-                
-                int x = Mathf.RoundToInt(worldPosition.x);
-                int y = Mathf.RoundToInt(worldPosition.z);
-
-                bool available = !(x < 0 || x > gridSize.x - _flyingBuilding.size.x || y < 0 ||
-                                   y > gridSize.y - _flyingBuilding.size.y || IsPlaceTaken(x, y));
-                
-                RaycastHit hit;
-                if (Physics.Raycast(ray, out hit))
-                {
-                    GameObject obj = hit.transform.gameObject;
-                    if (obj.transform.parent != null && obj.transform.parent.gameObject.tag.Contains("Ground"))
-                    {
-                        GroundTypes type = obj.GetComponentInParent<GroundObject>().groundTypes;
-
-                        if (type != GroundTypes.Grass)
-                        {
-                            available = false;
-                        }
-                    }
-                }
-
-                _flyingBuilding.transform.position = new Vector3(x, 0, y);
-                _flyingBuilding.SetTransparent(available);
-
-                if (available && Input.GetMouseButtonUp(0))
-                {
-                    PlaceFlyingBuilding(x, y);
-                }
+                var type = obj.GetComponentInParent<GroundObject>().groundTypes;
+                available = type == GroundTypes.Grass && available;
             }
         }
+
+        return available;
     }
 
     private bool IsPlaceTaken(int placeX, int placeY)
@@ -93,7 +122,7 @@ public class BuildingsGrid : MonoBehaviour
                 _grid[placeX + x, placeY + y] = _flyingBuilding;
             }
         }
-        
+
         _flyingBuilding.SetNormal();
         _flyingBuilding = null;
     }
