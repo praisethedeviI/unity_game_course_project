@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4259396283775346339}
-  - component: {fileID: 5229460576907697377}
   m_Layer: 0
   m_Name: Statue
   m_TagString: Untagged
@@ -32,23 +31,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5229460576907697377
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7581591292504702262}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7dfcb7a4adc59f4298c01b19f3d1996, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mainRenderer: {fileID: 5722549798709651948}
-  size: {x: 1, y: 1}
-  mainColor: {r: 0, g: 0, b: 0, a: 0}
-  tr: {fileID: 4259396283775346339}
-  position: {x: 0, y: 0, z: 0}
 --- !u!1001 &6389201703965619560
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -109,10 +91,5 @@ PrefabInstance:
 --- !u!4 &6854962848906187395 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e3e0719ff6666a047a3513595882c17f, type: 3}
-  m_PrefabInstance: {fileID: 6389201703965619560}
-  m_PrefabAsset: {fileID: 0}
---- !u!23 &5722549798709651948 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: e3e0719ff6666a047a3513595882c17f, type: 3}
   m_PrefabInstance: {fileID: 6389201703965619560}
   m_PrefabAsset: {fileID: 0}

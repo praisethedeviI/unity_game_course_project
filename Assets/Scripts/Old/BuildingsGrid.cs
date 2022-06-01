@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Serialization;
 
+
 public class BuildingsGrid : MonoBehaviour
 {
     [FormerlySerializedAs("GridSize")] public Vector2Int gridSize;
@@ -31,27 +32,28 @@ public class BuildingsGrid : MonoBehaviour
         if (_flyingBuilding == null) return;
         var groundPlane = new Plane(Vector3.up, Vector3.zero);
         Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
-        
-        
+
+
         if (!groundPlane.Raycast(ray, out var position)) return;
         Vector3 mousePos = ray.GetPoint(position);
-        
+
         var x = Mathf.RoundToInt(mousePos.x);
         var y = Mathf.RoundToInt(mousePos.z);
 
-        var available = CanPlaceBuilding(x, y);
+        var availableOnMousePos = CanPlaceBuilding(x, y);
 
         if (!Input.GetMouseButton(1))
         {
             MoveBuilding(mousePos);
-            _flyingBuilding.SetTransparent(available);
+            _flyingBuilding.SetTransparent(availableOnMousePos);
         }
-        if (available && Input.GetMouseButton(1))
+        
+        if (Input.GetMouseButton(1))
         {
             RotateBuilding(mousePos);
         }
 
-        if (available && Input.GetMouseButton(0))
+        if (availableOnMousePos && Input.GetMouseButton(0))
         {
             PlaceFlyingBuilding(x, y);
         }
@@ -67,7 +69,8 @@ public class BuildingsGrid : MonoBehaviour
     private void RotateBuilding(Vector3 mousePos)
     {
         Transform tr;
-        (tr = _flyingBuilding.transform).LookAt(new Vector3(mousePos.x, _flyingBuilding.transform.position.y, mousePos.z));
+        (tr = _flyingBuilding.transform).LookAt(new Vector3(mousePos.x, _flyingBuilding.transform.position.y,
+            mousePos.z));
         var rot = tr.rotation;
         int y = Mathf.FloorToInt(rot.eulerAngles.y);
         y = (y > 45 && y <= 135) ? 90 : y;

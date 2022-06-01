@@ -4,7 +4,7 @@ public class CameraController : MonoBehaviour
 {
     public float panSpeed = 10f;
     public float panBorderThickness = 10f;
-    public Grid grid;
+    public GameObject grid;
     
     
     
@@ -41,7 +41,7 @@ public class CameraController : MonoBehaviour
         var scroll = Input.GetAxis("Mouse ScrollWheel");
         pos.y -= scroll * scrollSpeed * 100f * Time.deltaTime;
         rot.x = 7.8f * pos.y + 6.8f;
-            
+
         Vector2 panLimit = grid.gameObject.GetComponent<BuildingsGrid>().gridSize;
 
         pos.y = Mathf.Clamp(pos.y, 3, 7);
