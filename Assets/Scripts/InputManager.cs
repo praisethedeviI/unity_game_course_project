@@ -29,7 +29,7 @@ public class InputManager : MonoBehaviour
         RaycastHit hit;
         Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, groundMask))
-        {
+        {   
             Vector3Int positionInt = Vector3Int.RoundToInt(hit.point);
             return positionInt;
         }

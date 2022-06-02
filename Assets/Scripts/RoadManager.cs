@@ -19,7 +19,7 @@ public class RoadManager : MonoBehaviour
     
     public GameObject roadStraight;
 
-    [FormerlySerializedAs("RoadFixer")] public RoadFixer roadFixer;
+        public RoadFixer roadFixer;
 
     private void Start()
     {
@@ -32,6 +32,9 @@ public class RoadManager : MonoBehaviour
             return;
 
         if (placementManager.CheckIfPositionIsFree(pos) == false)
+            return;
+        
+        if (placementManager.CheckIfPositionInWaterLayer(pos))
             return;
 
         if (!placementMode)
@@ -111,4 +114,3 @@ public class RoadManager : MonoBehaviour
         startPosition = Vector3Int.zero;
     }
 }
-

@@ -47,7 +47,7 @@ public class PlacementManager : MonoBehaviour
     public void PlaceGround(Vector3Int pos, GameObject prefab, CellType type)
     {
         placementGrid[pos.x, pos.z] = type;
-        StructureModel structure = CreateANewStructureModel(pos, prefab, type);
+        CreateANewStructureModel(pos, prefab, type);
         temporaryRoadObjects.Remove(pos);
     }
 
@@ -139,19 +139,27 @@ public class PlacementManager : MonoBehaviour
         );
         foreach (var item in hits)
         {
-            Destroy(item.collider.gameObject);
+            Destroy(item.collider.transform.parent.gameObject);
         }
     }
 
     private void DestroyGroundAt(Vector3Int pos)
     {
 
-        RaycastHit[] hits = Physics.BoxCastAll(pos + new Vector3(0f, 0f, 0f), new Vector3(0.1f, 0.1f, 0.1f),
+        RaycastHit[] hits = Physics.BoxCastAll(pos, new Vector3(0.1f, 0.1f, 0.1f),
             transform.up, Quaternion.identity, 1f, 1 << LayerMask.NameToLayer("Ground")
         );
         foreach (var item in hits)
         {
-            Destroy(item.collider.gameObject);
+            Destroy(item.collider.transform.parent.gameObject);
         }
+    }
+
+    public bool CheckIfPositionInWaterLayer(Vector3Int pos)
+    {
+        RaycastHit[] hits = Physics.BoxCastAll(pos, new Vector3(0.1f, 0.1f, 0.1f),
+            transform.up, Quaternion.identity, 1f, 1 << LayerMask.NameToLayer("Water")
+        );
+        return hits.Length > 0;
     }
 }

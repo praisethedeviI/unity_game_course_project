@@ -6,24 +6,55 @@ using UnityEngine;
 
 public class StructureManager : MonoBehaviour
 {
-    public StructurePrefabWeighted[] housesPrefabs, specialPrefabs;
+    public StructurePrefab[] housePrefabs, specialPrefabs;
     public PlacementManager placementManager;
+    public ResourceManager resourceManager;
 
     private float[] houseWeights, specialWeights;
 
+    private Dictionary<StructurePrefab, int> structuresQuantityDictionary = new Dictionary<StructurePrefab, int>();
+
     private void Start()
     {
-        houseWeights = housesPrefabs.Select(prefabStats => prefabStats.weight).ToArray();
+        houseWeights = housePrefabs.Select(prefabStats => prefabStats.weight).ToArray();
         specialWeights = specialPrefabs.Select(prefabStats => prefabStats.weight).ToArray();
+    }
+
+    private bool IsEnoughResource(StructurePrefab prefab)
+    {
+        return resourceManager.SpendResource(ResourceType.Rock, prefab.resourcesCost.money) &&
+               resourceManager.SpendResource(ResourceType.Tree, prefab.resourcesCost.tree) &&
+               resourceManager.SpendResource(ResourceType.Money, prefab.resourcesCost.rock);
     }
 
     public void PlaceHouse(Vector3Int pos)
     {
-        if (CheckPositionBeforePlacement(pos))
+        if (!IsEnoughResource(housePrefabs[0]))
         {
-            placementManager.PlaceObjectOnTheMap(pos, housesPrefabs[0].prefab, CellType.Structure);
-            RotateStructure(pos, housesPrefabs[0].prefab);
+            Debug.Log("Not enough resource!");
+            return;
         }
+
+        if (!CheckPositionBeforePlacement(pos))
+            return;
+
+        IncreaseQuantityOfStructuresDictionary(housePrefabs[0]);
+
+        placementManager.PlaceObjectOnTheMap(pos, housePrefabs[0].prefab, CellType.Structure);
+        RotateStructure(pos, housePrefabs[0].prefab);
+    }
+
+    private void IncreaseQuantityOfStructuresDictionary(StructurePrefab prefab)
+    {
+        if (!structuresQuantityDictionary.ContainsKey(prefab))
+            structuresQuantityDictionary.Add(prefab, 0);
+
+        structuresQuantityDictionary[prefab] += 1;
+    }
+
+    public Dictionary<StructurePrefab, int> GetStructuresQuantityDictionary()
+    {
+        return structuresQuantityDictionary;
     }
 
     private void RotateStructure(Vector3Int pos, GameObject prefab)
@@ -47,11 +78,19 @@ public class StructureManager : MonoBehaviour
 
     public void PlaceSpecial(Vector3Int pos)
     {
-        if (CheckPositionBeforePlacement(pos))
+        if (!IsEnoughResource(specialPrefabs[0]))
         {
-            placementManager.PlaceObjectOnTheMap(pos, specialPrefabs[0].prefab, CellType.Structure);
-            RotateStructure(pos, specialPrefabs[0].prefab);
+            Debug.Log("Not enough resource!");
+            return;
         }
+
+        if (!CheckPositionBeforePlacement(pos))
+            return;
+
+        IncreaseQuantityOfStructuresDictionary(specialPrefabs[0]);
+
+        placementManager.PlaceObjectOnTheMap(pos, specialPrefabs[0].prefab, CellType.Structure);
+        RotateStructure(pos, specialPrefabs[0].prefab);
     }
 
     private bool CheckPositionBeforePlacement(Vector3Int pos)
@@ -73,14 +112,17 @@ public class StructureManager : MonoBehaviour
             Debug.Log("Must be placed near a road");
             return false;
         }
+
         return true;
     }
 }
 
 [Serializable]
-public struct StructurePrefabWeighted
+public struct StructurePrefab
 {
+    public Resources resourcesIncome;
+    public Resources resourcesCost;
+    
     public GameObject prefab;
-    [Range(0, 1)]
-    public float weight;
+    [Range(0, 1)] public float weight;
 }

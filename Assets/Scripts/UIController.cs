@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class UIController : MonoBehaviour
 {
     public Action OnRoadPlacement, OnHousePlacement, OnSpecialPlacement;
+    public Text moneyText, treeText, rockText;
     public Button placeRoadButton, placeHouseButton, placeSpecialButton;
 
     public Color outlineColor;
@@ -16,7 +17,7 @@ public class UIController : MonoBehaviour
     private void Start()
     {
         buttonList = new List<Button> {placeRoadButton, placeHouseButton, placeSpecialButton};
-        
+
         placeRoadButton.onClick.AddListener(() =>
         {
             ResetButtonColor();
