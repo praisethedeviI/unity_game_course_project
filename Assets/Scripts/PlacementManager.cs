@@ -1,16 +1,13 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class PlacementManager : MonoBehaviour
 {
     public int width, height;
     private Grid placementGrid;
+    private Dictionary<Vector3Int, StructureModel> structureDictionary = new Dictionary<Vector3Int, StructureModel>();
 
     private Dictionary<Vector3Int, StructureModel> temporaryRoadObjects = new Dictionary<Vector3Int, StructureModel>();
-    private Dictionary<Vector3Int, StructureModel> structureDictionary = new Dictionary<Vector3Int, StructureModel>();
 
 
     private void Start()
@@ -43,7 +40,7 @@ public class PlacementManager : MonoBehaviour
         temporaryRoadObjects.Add(pos, structure);
         DestroyGroundAt(pos);
     }
-    
+
     public void PlaceGround(Vector3Int pos, GameObject prefab, CellType type)
     {
         placementGrid[pos.x, pos.z] = type;
@@ -98,11 +95,11 @@ public class PlacementManager : MonoBehaviour
         temporaryRoadObjects.Clear();
     }
 
-    public List<Vector3Int> GetPathBetween(Vector3Int startPosition, Vector3Int endPosition)
+    public List<Vector3Int> GetPathBetween(Vector3Int startPosition, Vector3Int endPosition, bool isAgent = false)
     {
         var resultPath = GridSearch.AStarSearch(placementGrid,
             new Point(startPosition.x, startPosition.z),
-            new Point(endPosition.x, endPosition.z));
+            new Point(endPosition.x, endPosition.z), isAgent);
         List<Vector3Int> path = new List<Vector3Int>();
         foreach (var point in resultPath)
         {
@@ -145,7 +142,6 @@ public class PlacementManager : MonoBehaviour
 
     private void DestroyGroundAt(Vector3Int pos)
     {
-
         RaycastHit[] hits = Physics.BoxCastAll(pos, new Vector3(0.1f, 0.1f, 0.1f),
             transform.up, Quaternion.identity, 1f, 1 << LayerMask.NameToLayer("Ground")
         );
@@ -161,5 +157,61 @@ public class PlacementManager : MonoBehaviour
             transform.up, Quaternion.identity, 1f, 1 << LayerMask.NameToLayer("Water")
         );
         return hits.Length > 0;
+    }
+
+    public List<StructureModel> GetAllHouses()
+    {
+        List<StructureModel> returnList = new List<StructureModel>();
+        var housePositions = placementGrid.GetAllHouses();
+        foreach (var point in housePositions)
+        {
+            returnList.Add(structureDictionary[new Vector3Int(point.X, 0, point.Y)]);
+        }
+
+        return returnList;
+    }
+
+    internal List<StructureModel> GetAllSpecialStructures()
+    {
+        List<StructureModel> returnList = new List<StructureModel>();
+        var housePositions = placementGrid.GetAllSpecialStructure();
+        foreach (var point in housePositions)
+        {
+            returnList.Add(structureDictionary[new Vector3Int(point.X, 0, point.Y)]);
+        }
+
+        return returnList;
+    }
+
+    public StructureModel GetRandomSpecialStructure()
+    {
+        var point = placementGrid.GetRandomSpecialStructurePoint();
+        return GetStructureAt(point);
+    }
+
+    public StructureModel GetRandomHouseStructure()
+    {
+        var point = placementGrid.GetRandomHouseStructurePoint();
+        return GetStructureAt(point);
+    }
+
+    private StructureModel GetStructureAt(Point point)
+    {
+        if (point != null)
+        {
+            return structureDictionary[new Vector3Int(point.X, 0, point.Y)];
+        }
+
+        return null;
+    }
+
+    public StructureModel GetStructureAt(Vector3Int position)
+    {
+        if (structureDictionary.ContainsKey(position))
+        {
+            return structureDictionary[position];
+        }
+
+        return null;
     }
 }

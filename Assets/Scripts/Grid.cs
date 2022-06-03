@@ -6,14 +6,14 @@ using System.Collections.Generic;
 /// </summary>
 public class Point
 {
-    public int X { get; set; }
-    public int Y { get; set; }
-
     public Point(int x, int y)
     {
         this.X = x;
         this.Y = y;
     }
+
+    public int X { get; set; }
+    public int Y { get; set; }
 
     public override bool Equals(object obj)
     {
@@ -21,11 +21,13 @@ public class Point
         {
             return false;
         }
+
         if (obj is Point)
         {
             Point p = obj as Point;
             return this.X == p.X && this.Y == p.Y;
         }
+
         return false;
     }
 
@@ -59,13 +61,12 @@ public enum CellType
 public class Grid
 {
     private CellType[,] _grid;
-    private int _width;
-    public int Width { get { return _width; } }
     private int _height;
-    public int Height { get { return _height; } }
+    private List<Point> _houseStructure = new List<Point>();
 
     private List<Point> _roadList = new List<Point>();
     private List<Point> _specialStructure = new List<Point>();
+    private int _width;
 
     public Grid(int width, int height)
     {
@@ -74,13 +75,20 @@ public class Grid
         _grid = new CellType[width, height];
     }
 
+    public int Width
+    {
+        get { return _width; }
+    }
+
+    public int Height
+    {
+        get { return _height; }
+    }
+
     // Adding index operator to our Grid class so that we can use grid[][] to access specific cell from our grid. 
     public CellType this[int i, int j]
     {
-        get
-        {
-            return _grid[i, j];
-        }
+        get { return _grid[i, j]; }
         set
         {
             if (value == CellType.Road)
@@ -91,6 +99,7 @@ public class Grid
             {
                 _roadList.Remove(new Point(i, j));
             }
+
             if (value == CellType.SpecialStructure)
             {
                 _specialStructure.Add(new Point(i, j));
@@ -99,6 +108,16 @@ public class Grid
             {
                 _specialStructure.Remove(new Point(i, j));
             }
+
+            if (value == CellType.Structure)
+            {
+                _houseStructure.Add(new Point(i, j));
+            }
+            else
+            {
+                _houseStructure.Remove(new Point(i, j));
+            }
+
             _grid[i, j] = value;
         }
     }
@@ -109,6 +128,7 @@ public class Grid
         {
             return cellType == CellType.Road;
         }
+
         return cellType == CellType.Empty || cellType == CellType.Road;
     }
 
@@ -116,6 +136,26 @@ public class Grid
     {
         Random rand = new Random();
         return _roadList[rand.Next(0, _roadList.Count - 1)];
+    }
+
+    public List<Point> GetAllHouses()
+    {
+        return _houseStructure;
+    }
+
+    internal List<Point> GetAllSpecialStructure()
+    {
+        return _specialStructure;
+    }
+
+    public Point GetRandomHouseStructurePoint()
+    {
+        if (_houseStructure.Count == 0)
+        {
+            return null;
+        }
+
+        return _houseStructure[UnityEngine.Random.Range(0, _houseStructure.Count)];
     }
 
     public Point GetRandomSpecialStructurePoint()
@@ -141,18 +181,22 @@ public class Grid
         {
             adjacentCells.Add(new Point(x - 1, y));
         }
+
         if (x < _width - 1)
         {
             adjacentCells.Add(new Point(x + 1, y));
         }
+
         if (y > 0)
         {
             adjacentCells.Add(new Point(x, y - 1));
         }
+
         if (y < _height - 1)
         {
             adjacentCells.Add(new Point(x, y + 1));
         }
+
         return adjacentCells;
     }
 
@@ -161,11 +205,12 @@ public class Grid
         List<Point> adjacentCells = GetAllAdjacentCells(x, y);
         for (int i = adjacentCells.Count - 1; i >= 0; i--)
         {
-            if(IsCellWakable(_grid[adjacentCells[i].X, adjacentCells[i].Y], isAgent)==false)
+            if (IsCellWakable(_grid[adjacentCells[i].X, adjacentCells[i].Y], isAgent) == false)
             {
                 adjacentCells.RemoveAt(i);
             }
         }
+
         return adjacentCells;
     }
 
@@ -179,6 +224,7 @@ public class Grid
                 adjacentCells.RemoveAt(i);
             }
         }
+
         return adjacentCells;
     }
 
@@ -195,18 +241,22 @@ public class Grid
         {
             neighbours[0] = _grid[x - 1, y];
         }
+
         if (x < _width - 1)
         {
             neighbours[2] = _grid[x + 1, y];
         }
+
         if (y > 0)
         {
             neighbours[3] = _grid[x, y - 1];
         }
+
         if (y < _height - 1)
         {
             neighbours[1] = _grid[x, y + 1];
         }
+
         return neighbours;
     }
 }
