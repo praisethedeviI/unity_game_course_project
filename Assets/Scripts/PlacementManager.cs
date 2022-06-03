@@ -71,7 +71,7 @@ public class PlacementManager : MonoBehaviour
         return placementGrid.GetAllAdjacentCellTypes(pos.x, pos.z);
     }
 
-    public List<Vector3Int> GetNeighbourOfTypeFor(Vector3Int pos, CellType type)
+    public List<Vector3Int> GetNeighboursOfTypeFor(Vector3Int pos, CellType type)
     {
         var neighbourVertices = placementGrid.GetAdjacentCellsOfType(pos.x, pos.z, type);
         List<Vector3Int> neighbours = new List<Vector3Int>();
@@ -126,7 +126,26 @@ public class PlacementManager : MonoBehaviour
         placementGrid[pos.x, pos.z] = type;
         StructureModel structure = CreateANewStructureModel(pos, structurePrefab, type);
         structureDictionary.Add(pos, structure);
+        
+        var structureNeedingRoad = structure.GetComponent<INeedingRoad>();
+        if (structureNeedingRoad != null)
+        {
+            structureNeedingRoad.RoadPosition = GetNearestRoadPosition(new Vector3Int(pos.x, 0, pos.z)).Value;
+            Debug.Log("My nearest road position is: " + structureNeedingRoad.RoadPosition);
+        }
+
         DestroyNatureAt(pos);
+    }
+
+    private Vector3Int? GetNearestRoadPosition(Vector3Int position)
+    {
+        var roads = GetNeighboursOfTypeFor(position, CellType.Road);
+        if (roads.Count > 0)
+        {
+            return roads[0];
+        }
+
+        return new Vector3Int(-1, 0, -1);
     }
 
     private void DestroyNatureAt(Vector3Int pos)

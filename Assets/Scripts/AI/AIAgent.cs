@@ -35,6 +35,12 @@ public class AIAgent : MonoBehaviour
         pathToGo = path;
         index = 1;
         moveFlag = true;
+        if (pathToGo.Count <= 1)
+        {
+            moveFlag = false;
+            Destroy(gameObject);
+            return;
+        }
         endPosition = pathToGo[index];
         animator = GetComponent<Animator>();
         animator.SetTrigger("Walk");

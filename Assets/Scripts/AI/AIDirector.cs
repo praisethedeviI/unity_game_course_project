@@ -32,6 +32,7 @@ public class AIDirector : MonoBehaviour
             {
                 path.Reverse();
                 var AiAgent = agent.GetComponent<AIAgent>();
+                var list = new List<Vector3>(path.Select(x => (Vector3) x).ToList());
                 AiAgent.Initialize(new List<Vector3>(path.Select(x => (Vector3)x).ToList()));
             }
         }
