@@ -11,6 +11,7 @@ public class AIDirector : MonoBehaviour
 
     public void SpawnAllAgents()
     {
+        Debug.Log(placementManager.GetAllHouses());
         foreach (var house in placementManager.GetAllHouses())
         {
             for (var i = 0; i < UnityEngine.Random.Range(minPedestriansPerHouse, maxPedestriansPerHouse); i++)
