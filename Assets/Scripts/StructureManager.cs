@@ -58,13 +58,15 @@ public class StructureManager : MonoBehaviour
     {
         return structuresQuantityDictionary;
     }
-
+    
+    //[left, bottom, right, up]
     private void RotateStructure(Vector3Int pos, GameObject prefab)
     {
         var yAxis = -1;
         var result = placementManager.GetNeighbourTypesFor(pos);
         for (var i = 0; i < 4; i++)
         {
+            // var tmpPos = i >= 2 ? i - 2 : i + 2; 
             if (result[i] == CellType.Road)
             {
                 yAxis = -90 + i * 90;

@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class DayNightCycle : MonoBehaviour
 {
+    public AIDirector aiDirector;
+    
     [Range(0.0f, 1.0f)] public float time;
 
     public float fullDayLenght;
@@ -58,7 +60,7 @@ public class DayNightCycle : MonoBehaviour
 
         //enable / disable sun
 
-        if (sun.intensity == 0 && sun.gameObject.activeInHierarchy)
+        if (sun.intensity <= 0 && sun.gameObject.activeInHierarchy)
         {
             sun.gameObject.SetActive(false);
         }

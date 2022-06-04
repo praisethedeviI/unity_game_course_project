@@ -8,10 +8,9 @@ public class AIDirector : MonoBehaviour
     public GameObject[] pedestrianPrefabs;
     public int maxPedestriansPerHouse = 2;
     public int minPedestriansPerHouse = 2;
-
+    
     public void SpawnAllAgents()
     {
-        Debug.Log(placementManager.GetAllHouses());
         foreach (var house in placementManager.GetAllHouses())
         {
             for (var i = 0; i < UnityEngine.Random.Range(minPedestriansPerHouse, maxPedestriansPerHouse); i++)
@@ -31,15 +30,16 @@ public class AIDirector : MonoBehaviour
             if (path.Count > 0)
             {
                 var agent = Instantiate(GetRandomPedestrian(), startPosition, Quaternion.identity);
+                agent.transform.SetParent(transform);
                 path.Reverse();
                 var AiAgent = agent.GetComponent<AIAgent>();
                 
                 var list = new List<Vector3>();
                 foreach (var pos in path)
                 {
-                    var xAdd = UnityEngine.Random.Range(-0.5f, 0.5f);
-                    var zAdd = UnityEngine.Random.Range(-0.5f, 0.5f);
-                    list.Add(new Vector3(xAdd, 0, zAdd) + (Vector3) pos);
+                    var xAdd = UnityEngine.Random.Range(-0.3f, 0.3f);
+                    var zAdd = UnityEngine.Random.Range(-0.3f, 0.3f);
+                    list.Add(new Vector3(xAdd, 0, zAdd) + pos);
                 }
                 
                 AiAgent.Initialize(list);

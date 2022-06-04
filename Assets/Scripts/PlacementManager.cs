@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class PlacementManager : MonoBehaviour
@@ -9,10 +12,10 @@ public class PlacementManager : MonoBehaviour
 
     private Dictionary<Vector3Int, StructureModel> temporaryRoadObjects = new Dictionary<Vector3Int, StructureModel>();
 
-
-    private void Start()
+    private void Awake()
     {
         placementGrid = new Grid(width, height);
+
     }
 
     public bool CheckIfPositionInBound(Vector3Int pos)
@@ -44,18 +47,33 @@ public class PlacementManager : MonoBehaviour
     public void PlaceGround(Vector3Int pos, GameObject prefab, CellType type)
     {
         placementGrid[pos.x, pos.z] = type;
-        CreateANewStructureModel(pos, prefab, type);
+        CreateANewStructureModel(pos, prefab, type, "Ground");
         temporaryRoadObjects.Remove(pos);
     }
 
-    private StructureModel CreateANewStructureModel(Vector3Int pos, GameObject structurePrefab, CellType type)
+    private StructureModel CreateANewStructureModel(Vector3Int pos, GameObject structurePrefab, CellType type, String layer = null)
     {
         GameObject structure = new GameObject(type.ToString());
+        if (layer != null)
+        {
+            structure.layer = LayerMask.NameToLayer(layer);
+        }
         structure.transform.SetParent(transform);
         structure.transform.localPosition = pos;
         var structureModel = structure.AddComponent<StructureModel>();
         structureModel.CreateModel(structurePrefab);
         return structureModel;
+    }
+
+    public void PlaceNature(Vector3 pos, GameObject prefab, String layer)
+    {
+        var structure = new GameObject("Nature")
+        {
+            layer = LayerMask.NameToLayer(layer)
+        };
+        structure.transform.SetParent(transform);
+        structure.transform.localPosition = pos;
+        Instantiate(prefab, structure.transform);
     }
 
     public void ModifyStructureModel(Vector3Int pos, GameObject newModel, Quaternion rotation)
