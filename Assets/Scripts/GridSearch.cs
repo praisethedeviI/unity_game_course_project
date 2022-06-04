@@ -18,20 +18,20 @@ public class GridSearch {
     {
         List<Point> path = new List<Point>();
 
-        List<Point> positionsTocheck = new List<Point>();
+        List<Point> positionsToCheck = new List<Point>();
         Dictionary<Point, float> costDictionary = new Dictionary<Point, float>();
         Dictionary<Point, float> priorityDictionary = new Dictionary<Point, float>();
         Dictionary<Point, Point> parentsDictionary = new Dictionary<Point, Point>();
 
-        positionsTocheck.Add(startPosition);
+        positionsToCheck.Add(startPosition);
         priorityDictionary.Add(startPosition, 0);
         costDictionary.Add(startPosition, 0);
         parentsDictionary.Add(startPosition, null);
 
-        while (positionsTocheck.Count > 0)
+        while (positionsToCheck.Count > 0)
         {
-            Point current = GetClosestVertex(positionsTocheck, priorityDictionary);
-            positionsTocheck.Remove(current);
+            Point current = GetClosestVertex(positionsToCheck, priorityDictionary);
+            positionsToCheck.Remove(current);
             if (current.Equals(endPosition))
             {
                 path = GeneratePath(parentsDictionary, current);
@@ -45,8 +45,8 @@ public class GridSearch {
                 {
                     costDictionary[neighbour] = newCost;
 
-                    float priority = newCost + ManhattanDiscance(endPosition, neighbour);
-                    positionsTocheck.Add(neighbour);
+                    float priority = newCost + ManhattanDistance(endPosition, neighbour);
+                    positionsToCheck.Add(neighbour);
                     priorityDictionary[neighbour] = priority;
 
                     parentsDictionary[neighbour] = current;
@@ -69,7 +69,7 @@ public class GridSearch {
         return candidate;
     }
 
-    private static float ManhattanDiscance(Point endPos, Point point)
+    private static float ManhattanDistance(Point endPos, Point point)
     {
         return Math.Abs(endPos.X - point.X) + Math.Abs(endPos.Y - point.Y);
     }

@@ -86,7 +86,7 @@ public class RoadManager : MonoBehaviour
         foreach (var tempPos in temporaryPlacementPositions)
         {
             roadFixer.FixRoadAtPosition(placementManager, tempPos);
-            var neighbours = placementManager.GetNeighbourOfTypeFor(tempPos, CellType.Road);
+            var neighbours = placementManager.GetNeighboursOfTypeFor(tempPos, CellType.Road);
             foreach (var roadPos in neighbours)
             {
                 if (!roadPositionsToRecheck.Contains(roadPos))
@@ -108,7 +108,7 @@ public class RoadManager : MonoBehaviour
         placementManager.AddTemporaryStructuresToDictionary();
         if (temporaryPlacementPositions.Count > 0)
         {
-            // AudioPlayer.instance.PlayPlacementSound();
+            AudioPlayer.instance.PlayPlacementSound();
         }
         temporaryPlacementPositions.Clear();
         startPosition = Vector3Int.zero;
