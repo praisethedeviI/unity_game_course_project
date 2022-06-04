@@ -108,7 +108,7 @@ public class RoadManager : MonoBehaviour
         placementManager.AddTemporaryStructuresToDictionary();
         if (temporaryPlacementPositions.Count > 0)
         {
-            // AudioPlayer.instance.PlayPlacementSound();
+            AudioPlayer.instance.PlayPlacementSound();
         }
         temporaryPlacementPositions.Clear();
         startPosition = Vector3Int.zero;

@@ -1,5 +1,6 @@
-using System;
 using System.Collections.Generic;
+using UnityEngine;
+using Random = System.Random;
 
 /// <summary>
 /// Source https://github.com/lordjesus/Packt-Introduction-to-graph-algorithms-for-game-developers

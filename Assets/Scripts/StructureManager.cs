@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using SVS;
 using UnityEngine;
 
 public class StructureManager : MonoBehaviour
@@ -20,28 +21,29 @@ public class StructureManager : MonoBehaviour
         specialWeights = specialPrefabs.Select(prefabStats => prefabStats.weight).ToArray();
     }
 
-    private bool IsEnoughResource(StructurePrefab prefab)
+    private bool TrySpendResources(StructurePrefab prefab)
     {
-        return resourceManager.SpendResource(ResourceType.Rock, prefab.resourcesCost.money) &&
+        return resourceManager.SpendResource(ResourceType.Money, prefab.resourcesCost.money) &&
                resourceManager.SpendResource(ResourceType.Tree, prefab.resourcesCost.tree) &&
-               resourceManager.SpendResource(ResourceType.Money, prefab.resourcesCost.rock);
+               resourceManager.SpendResource(ResourceType.Rock, prefab.resourcesCost.rock);
     }
 
     public void PlaceHouse(Vector3Int pos)
     {
-        if (!IsEnoughResource(housePrefabs[0]))
+        if (!CheckPositionBeforePlacement(pos))
+            return;
+        
+        if (!TrySpendResources(housePrefabs[0]))
         {
             Debug.Log("Not enough resource!");
             return;
         }
 
-        if (!CheckPositionBeforePlacement(pos))
-            return;
-
         IncreaseQuantityOfStructuresDictionary(housePrefabs[0]);
 
         placementManager.PlaceObjectOnTheMap(pos, housePrefabs[0].prefab, CellType.Structure);
         RotateStructure(pos, housePrefabs[0].prefab);
+        AudioPlayer.instance.PlayPlacementSound();
     }
 
     private void IncreaseQuantityOfStructuresDictionary(StructurePrefab prefab)
@@ -78,7 +80,7 @@ public class StructureManager : MonoBehaviour
 
     public void PlaceSpecial(Vector3Int pos)
     {
-        if (!IsEnoughResource(specialPrefabs[0]))
+        if (!TrySpendResources(specialPrefabs[0]))
         {
             Debug.Log("Not enough resource!");
             return;
@@ -91,6 +93,7 @@ public class StructureManager : MonoBehaviour
 
         placementManager.PlaceObjectOnTheMap(pos, specialPrefabs[0].prefab, CellType.Structure);
         RotateStructure(pos, specialPrefabs[0].prefab);
+        AudioPlayer.instance.PlayPlacementSound();
     }
 
     private bool CheckPositionBeforePlacement(Vector3Int pos)

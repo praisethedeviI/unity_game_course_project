@@ -6,17 +6,17 @@ public class AIDirector : MonoBehaviour
 {
     public PlacementManager placementManager;
     public GameObject[] pedestrianPrefabs;
+    public int maxPedestriansPerHouse = 2;
+    public int minPedestriansPerHouse = 2;
 
     public void SpawnAllAgents()
     {
         foreach (var house in placementManager.GetAllHouses())
         {
-            TrySpawningAnAgent(house, placementManager.GetRandomHouseStructure());
-        }
-
-        foreach (var specialStructure in placementManager.GetAllSpecialStructures())
-        {
-            TrySpawningAnAgent(specialStructure, placementManager.GetRandomSpecialStructure());
+            for (var i = 0; i < UnityEngine.Random.Range(minPedestriansPerHouse, maxPedestriansPerHouse); i++)
+            {
+                TrySpawningAnAgent(house, placementManager.GetRandomHouseStructure());
+            }
         }
     }
 
@@ -26,14 +26,22 @@ public class AIDirector : MonoBehaviour
         {
             var startPosition = ((INeedingRoad)startStructure).RoadPosition;
             var endPosition = ((INeedingRoad)endStructure).RoadPosition;
-            var agent = Instantiate(GetRandomPedestrian(), startPosition, Quaternion.identity);
             var path = placementManager.GetPathBetween(startPosition, endPosition, true);
             if (path.Count > 0)
             {
+                var agent = Instantiate(GetRandomPedestrian(), startPosition, Quaternion.identity);
                 path.Reverse();
                 var AiAgent = agent.GetComponent<AIAgent>();
-                var list = new List<Vector3>(path.Select(x => (Vector3) x).ToList());
-                AiAgent.Initialize(new List<Vector3>(path.Select(x => (Vector3)x).ToList()));
+                
+                var list = new List<Vector3>();
+                foreach (var pos in path)
+                {
+                    var xAdd = UnityEngine.Random.Range(-0.5f, 0.5f);
+                    var zAdd = UnityEngine.Random.Range(-0.5f, 0.5f);
+                    list.Add(new Vector3(xAdd, 0, zAdd) + (Vector3) pos);
+                }
+                
+                AiAgent.Initialize(list);
             }
         }
     }

@@ -52,9 +52,7 @@ public class GameManager : MonoBehaviour
 
     private void IncreaseResources() // по идее это должно быть в другом менеджере
     {
-        var dict = structureManager.GetStructuresQuantityDictionary();
-        if (dict.Count > 0)
-            resourceManager.CountIncome(structureManager.GetStructuresQuantityDictionary());
+        resourceManager.CountIncome(structureManager.GetStructuresQuantityDictionary());
         resourceManager.SetNewResourcesValues();
         uiController.moneyText.text = resourceManager.GetQuantityOfResource(ResourceType.Money).ToString();
         uiController.treeText.text = resourceManager.GetQuantityOfResource(ResourceType.Tree).ToString();

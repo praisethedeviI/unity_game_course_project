@@ -56,8 +56,10 @@ public class AIAgent : MonoBehaviour
                 index++;
                 if (index >= pathToGo.Count)
                 {
-                    moveFlag = false;
-                    Destroy(gameObject);
+                    pathToGo.Reverse();
+                    index = 0;
+                    // moveFlag = false;
+                    // Destroy(gameObject);
                     return;
                 }
 
