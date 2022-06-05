@@ -436,6 +436,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 0.2
   rotationSpeed: 10
+  aiDirector: {fileID: 0}
 --- !u!1 &1862301051048567280
 GameObject:
   m_ObjectHideFlags: 0

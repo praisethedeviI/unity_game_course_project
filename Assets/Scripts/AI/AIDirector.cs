@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 
 public class AIDirector : MonoBehaviour
@@ -13,11 +14,48 @@ public class AIDirector : MonoBehaviour
     {
         foreach (var house in placementManager.GetAllHouses())
         {
-            for (var i = 0; i < UnityEngine.Random.Range(minPedestriansPerHouse, maxPedestriansPerHouse); i++)
-            {
-                TrySpawningAnAgent(house, placementManager.GetRandomHouseStructure());
-            }
+            SpawnRandomCountOfAgents(house);
         }
+    }
+
+    public void SpawnRandomCountOfAgents(StructureModel house)
+    {
+        for (var i = 0; i < Random.Range(minPedestriansPerHouse, maxPedestriansPerHouse); i++)
+        {
+            var pos = Vector3Int.RoundToInt(house.transform.position);
+            var endStructure = GetEndStructureModel(pos);
+            if (endStructure == null)
+                return;
+            TrySpawningAnAgent(house, endStructure);
+        }
+    }
+
+    [CanBeNull]
+    public StructureModel GetEndStructureModel(Vector3Int pos)
+    {
+        return placementManager.GetRandomHouseStructure(new Point(pos.x, pos.z));
+    }
+
+    [CanBeNull]
+    public List<Vector3> GetPath(Vector3 start, Vector3 end)
+    {
+        var path = placementManager.GetPathBetween(Vector3Int.RoundToInt(start), Vector3Int.RoundToInt(end), true);
+        if (path.Count > 0)
+        {
+            path.Reverse();
+            var list = new List<Vector3>();
+            foreach (var pos in path)
+            {
+                var xAdd = Random.Range(-0.3f, 0.3f);
+                var zAdd = Random.Range(-0.3f, 0.3f);
+                list.Add(new Vector3(xAdd, 0, zAdd) + pos);
+            }
+
+            list[0] = start;
+            return list;
+        }
+
+        return null;
     }
 
     private void TrySpawningAnAgent(StructureModel startStructure, StructureModel endStructure)
@@ -33,12 +71,13 @@ public class AIDirector : MonoBehaviour
                 agent.transform.SetParent(transform);
                 path.Reverse();
                 var AiAgent = agent.GetComponent<AIAgent>();
-                
+                AiAgent.aiDirector = this;
+
                 var list = new List<Vector3>();
                 foreach (var pos in path)
                 {
-                    var xAdd = UnityEngine.Random.Range(-0.3f, 0.3f);
-                    var zAdd = UnityEngine.Random.Range(-0.3f, 0.3f);
+                    var xAdd = Random.Range(-0.3f, 0.3f);
+                    var zAdd = Random.Range(-0.3f, 0.3f);
                     list.Add(new Vector3(xAdd, 0, zAdd) + pos);
                 }
                 

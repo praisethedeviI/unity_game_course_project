@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using UnityEngine;
 using Random = System.Random;
 
@@ -157,6 +158,22 @@ public class Grid
         }
 
         return _houseStructure[UnityEngine.Random.Range(0, _houseStructure.Count)];
+    }
+
+    [CanBeNull]
+    public Point GetRandomHouseStructurePointExceptPosition(Point point)
+    {
+        if (_houseStructure.Count == 0)
+        {
+            return null;
+        }
+
+        var structures = new List<Point>(_houseStructure);
+        structures.Remove(point);
+        if (structures.Count == 0)
+            return null;
+
+        return structures[UnityEngine.Random.Range(0, structures.Count)];
     }
 
     public Point GetRandomSpecialStructurePoint()

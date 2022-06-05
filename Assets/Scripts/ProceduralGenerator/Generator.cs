@@ -58,13 +58,13 @@ namespace ProceduralGenerator
                             {
                                 var randNatureTree = Random.Range(0, NatureTreeList.Count - 1);
                                 placementManager.PlaceNature(new Vector3(x + randPosX, 0, y + randPosY),
-                                    NatureTreeList[randNatureTree], "Nature");
+                                    NatureTreeList[randNatureTree], "Tree");
                             }
                             else
                             {
                                 var randNatureRock = Random.Range(0, NatureRockList.Count - 1);
                                 placementManager.PlaceNature(new Vector3(x + randPosX, 0, y + randPosY),
-                                    NatureRockList[randNatureRock], "Nature");
+                                    NatureRockList[randNatureRock], "Rock");
                             }
                             
                         }

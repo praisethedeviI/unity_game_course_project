@@ -3,23 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using SVS;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using Random = System.Random;
 
 public class StructureManager : MonoBehaviour
 {
-    public StructurePrefab[] housePrefabs, specialPrefabs;
+    public StructurePrefab[] houseLvl1Prefabs, houseLvl2Prefabs, houseLvl3Prefabs, specialPrefabs;
     public PlacementManager placementManager;
     public ResourceManager resourceManager;
-
-    private float[] houseWeights, specialWeights;
+    public AIDirector aiDirector;
 
     private Dictionary<StructurePrefab, int> structuresQuantityDictionary = new Dictionary<StructurePrefab, int>();
-
-    private void Start()
-    {
-        houseWeights = housePrefabs.Select(prefabStats => prefabStats.weight).ToArray();
-        specialWeights = specialPrefabs.Select(prefabStats => prefabStats.weight).ToArray();
-    }
 
     private bool TrySpendResources(StructurePrefab prefab)
     {
@@ -28,21 +23,45 @@ public class StructureManager : MonoBehaviour
                resourceManager.SpendResource(ResourceType.Rock, prefab.resourcesCost.rock);
     }
 
+    public void TryUpgradeHouseToSecondLevel(Vector3Int pos)
+    {
+        var randHouse = UnityEngine.Random.Range(0, houseLvl2Prefabs.Length);
+
+        if (!TrySpendResources(houseLvl2Prefabs[randHouse]))
+        {
+            Debug.Log("Not enough resource!");
+            return;
+        }
+        
+        IncreaseQuantityOfStructuresDictionary(houseLvl2Prefabs[randHouse]);
+        placementManager.DestroyStructureAt(pos);
+        placementManager.PlaceObjectOnTheMap(pos, houseLvl2Prefabs[randHouse].prefab, CellType.Structure);
+        RotateStructure(pos, houseLvl2Prefabs[randHouse].prefab);
+
+        AudioPlayer.instance.PlayPlacementSound();
+        
+    }
+
     public void PlaceHouse(Vector3Int pos)
     {
         if (!CheckPositionBeforePlacement(pos))
             return;
         
-        if (!TrySpendResources(housePrefabs[0]))
+        var randHouse = UnityEngine.Random.Range(0, houseLvl1Prefabs.Length);
+
+        if (!TrySpendResources(houseLvl1Prefabs[randHouse]))
         {
             Debug.Log("Not enough resource!");
             return;
         }
+        
+        IncreaseQuantityOfStructuresDictionary(houseLvl1Prefabs[randHouse]);
 
-        IncreaseQuantityOfStructuresDictionary(housePrefabs[0]);
+        placementManager.PlaceObjectOnTheMap(pos, houseLvl1Prefabs[randHouse].prefab, CellType.Structure);
+        
+        RotateStructure(pos, houseLvl1Prefabs[randHouse].prefab);
+        aiDirector.SpawnRandomCountOfAgents(placementManager.GetStructureAt(pos));
 
-        placementManager.PlaceObjectOnTheMap(pos, housePrefabs[0].prefab, CellType.Structure);
-        RotateStructure(pos, housePrefabs[0].prefab);
         AudioPlayer.instance.PlayPlacementSound();
     }
 
@@ -82,19 +101,44 @@ public class StructureManager : MonoBehaviour
 
     public void PlaceSpecial(Vector3Int pos)
     {
-        if (!TrySpendResources(specialPrefabs[0]))
+        if (!CheckPositionBeforePlacement(pos))
+            return;
+
+        var treeHits = placementManager.GetAllObjectHitsByLayerAt(pos, "Tree");
+        var rockHits = placementManager.GetAllObjectHitsByLayerAt(pos, "Rock");
+
+        if (treeHits.Length <= 0 && rockHits.Length <= 0)
+        {
+            Debug.Log("There is no tree and rock");
+            return;
+        }
+
+        StructurePrefab specialPrefab;
+        if (treeHits.Length > 0 && rockHits.Length > 0)
+        {
+            var randSpecial = UnityEngine.Random.Range(0, treeHits.Length);
+            specialPrefab = specialPrefabs[randSpecial];
+        }
+        else if (treeHits.Length > 0)
+        {
+            specialPrefab = specialPrefabs[0];
+        }
+        else
+        {
+            specialPrefab = specialPrefabs[1];
+        }
+        
+        
+        if (!TrySpendResources(specialPrefab))
         {
             Debug.Log("Not enough resource!");
             return;
         }
 
-        if (!CheckPositionBeforePlacement(pos))
-            return;
+        IncreaseQuantityOfStructuresDictionary(specialPrefab);
 
-        IncreaseQuantityOfStructuresDictionary(specialPrefabs[0]);
-
-        placementManager.PlaceObjectOnTheMap(pos, specialPrefabs[0].prefab, CellType.Structure);
-        RotateStructure(pos, specialPrefabs[0].prefab);
+        placementManager.PlaceObjectOnTheMap(pos, specialPrefab.prefab, CellType.Structure);
+        RotateStructure(pos, specialPrefab.prefab);
         AudioPlayer.instance.PlayPlacementSound();
     }
 
@@ -127,7 +171,8 @@ public struct StructurePrefab
 {
     public Resources resourcesIncome;
     public Resources resourcesCost;
-    
+
+    public LayerMask layer;
+
     public GameObject prefab;
-    [Range(0, 1)] public float weight;
 }

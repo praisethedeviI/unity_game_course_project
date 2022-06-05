@@ -7,11 +7,13 @@ public class AIAgent : MonoBehaviour
 {
     public float speed = 0.2f;
     public float rotationSpeed = 10f;
-
+    
     Animator animator;
     Vector3 endPosition;
     int index = 0;
     bool moveFlag = false;
+    
+    public AIDirector aiDirector;
 
     List<Vector3> pathToGo = new List<Vector3>();
 
@@ -56,9 +58,9 @@ public class AIAgent : MonoBehaviour
                 index++;
                 if (index >= pathToGo.Count)
                 {
-                    moveFlag = false;
-                    Destroy(gameObject);
-                    pathToGo.Reverse();
+                    // moveFlag = false;
+                    // Destroy(gameObject);
+                    MakeNewPath();
                     index = 0;
                     
                     return;
@@ -66,6 +68,23 @@ public class AIAgent : MonoBehaviour
 
                 endPosition = pathToGo[index];
             }
+        }
+    }
+
+    private void MakeNewPath()
+    {
+        var oldEndPath = pathToGo[pathToGo.Count - 1];
+        var model = aiDirector.GetEndStructureModel(Vector3Int.RoundToInt(oldEndPath));
+        if (model == null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        pathToGo = aiDirector.GetPath(oldEndPath, model.RoadPosition);
+        if (pathToGo == null)
+        {
+            Destroy(gameObject);
         }
     }
 

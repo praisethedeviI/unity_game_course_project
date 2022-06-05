@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -168,13 +169,24 @@ public class PlacementManager : MonoBehaviour
 
     private void DestroyNatureAt(Vector3Int pos)
     {
-        RaycastHit[] hits = Physics.BoxCastAll(pos + new Vector3(0f, 0.5f, 0f), new Vector3(0.5f, 0.5f, 0.5f),
-            transform.up, Quaternion.identity, 1f, 1 << LayerMask.NameToLayer("Nature")
-        );
-        foreach (var item in hits)
+        DestroyObjectsByLayerAt(pos, "Tree");
+        DestroyObjectsByLayerAt(pos, "Rock");
+        DestroyObjectsByLayerAt(pos, "Nature");
+    }
+
+    private void DestroyObjectsByLayerAt(Vector3Int pos, string layer)
+    {
+        foreach (var item in GetAllObjectHitsByLayerAt(pos, layer))
         {
-            Destroy(item.collider.transform.parent.gameObject);
+            Destroy(item.collider.gameObject.transform.parent.gameObject.transform.parent.gameObject);
         }
+    }
+
+    public RaycastHit[] GetAllObjectHitsByLayerAt(Vector3Int pos, string layer)
+    {
+        return Physics.BoxCastAll(pos + new Vector3(0f, 0.5f, 0f), new Vector3(0.5f, 0.5f, 0.5f),
+            transform.up, Quaternion.identity, 1f, 1 << LayerMask.NameToLayer(layer)
+        );
     }
 
     private void DestroyGroundAt(Vector3Int pos)
@@ -184,7 +196,7 @@ public class PlacementManager : MonoBehaviour
         );
         foreach (var item in hits)
         {
-            Destroy(item.collider.transform.parent.gameObject);
+            Destroy(item.collider.gameObject.transform.parent.gameObject.transform.parent.gameObject);
         }
     }
 
@@ -202,12 +214,12 @@ public class PlacementManager : MonoBehaviour
         var housePositions = placementGrid.GetAllHouses();
         foreach (var point in housePositions)
         {
-            returnList.Add(structureDictionary[new Vector3Int(point.X, 0, point.Y)]);
+            returnList.Add(GetStructureAt(new Vector3Int(point.X, 0, point.Y)));
         }
 
         return returnList;
     }
-
+    
     internal List<StructureModel> GetAllSpecialStructures()
     {
         List<StructureModel> returnList = new List<StructureModel>();
@@ -220,15 +232,30 @@ public class PlacementManager : MonoBehaviour
         return returnList;
     }
 
+    public void DestroyStructureAt(Vector3Int pos)
+    {
+        var structure = GetStructureAt(pos);
+        placementGrid[pos.x, pos.z] = CellType.Empty;
+        Destroy(structure.gameObject);
+    }
+
     public StructureModel GetRandomSpecialStructure()
     {
         var point = placementGrid.GetRandomSpecialStructurePoint();
         return GetStructureAt(point);
     }
 
-    public StructureModel GetRandomHouseStructure()
+    [CanBeNull]
+    public StructureModel GetRandomHouseStructure(Point housePoint = null)
     {
-        var point = placementGrid.GetRandomHouseStructurePoint();
+        Point point;
+        if (housePoint == null)
+            point = placementGrid.GetRandomHouseStructurePoint();
+        else
+            point = placementGrid.GetRandomHouseStructurePointExceptPosition(housePoint);
+
+        if (point == null)
+            return null;
         return GetStructureAt(point);
     }
 

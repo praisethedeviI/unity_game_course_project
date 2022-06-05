@@ -7,16 +7,34 @@ using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
 {
-    public Action OnRoadPlacement, OnHousePlacement, OnSpecialPlacement;
+    public Action OnRoadPlacement, OnHousePlacement, OnSpecialPlacement, OnCloseMenu, OnModifyStructure;
+    public Button placeRoadButton, placeHouseButton, placeSpecialButton, closeButton, modifyStructureButton;
+
+    public GameObject modifyStructurePanel;
+    
     public Text moneyText, treeText, rockText;
-    public Button placeRoadButton, placeHouseButton, placeSpecialButton;
 
     public Color outlineColor;
     private List<Button> buttonList;
 
+    public PlacementManager placementManager; 
+
     private void Start()
     {
-        buttonList = new List<Button> {placeRoadButton, placeHouseButton, placeSpecialButton};
+        buttonList = new List<Button> {placeRoadButton, placeHouseButton, placeSpecialButton, modifyStructureButton};
+        
+        modifyStructureButton.onClick.AddListener(() =>
+        {
+            ResetButtonColor();
+            ModifyOutline(modifyStructureButton);
+            OnModifyStructure?.Invoke();
+        });
+        
+        closeButton.onClick.AddListener(() =>
+        {
+            ResetButtonColor();
+            OnCloseMenu?.Invoke();
+        });
 
         placeRoadButton.onClick.AddListener(() =>
         {
@@ -51,5 +69,14 @@ public class UIController : MonoBehaviour
         {
             button.GetComponent<Outline>().enabled = false;
         }
+    }
+
+    public void SetPanelActive(Vector3Int pos)
+    {
+        var structure = placementManager.GetStructureAt(pos);
+        if (structure == null) return;
+
+        modifyStructurePanel.SetActive(true);
+        // structure
     }
 }

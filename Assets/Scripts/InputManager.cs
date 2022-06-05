@@ -56,7 +56,8 @@ public class InputManager : MonoBehaviour
 
     private void CheckClickUpEvent()
     {
-        if (Input.GetMouseButtonUp(0) && EventSystem.current.IsPointerOverGameObject() == false)
+        // if (Input.GetMouseButtonUp(0) && EventSystem.current.IsPointerOverGameObject() == false)
+        if (Input.GetMouseButtonUp(0))
         {
             OnMouseUp?.Invoke();
         }
