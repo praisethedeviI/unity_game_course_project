@@ -7091,9 +7091,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultResources:
-    money: 10000
-    tree: 10000
-    rock: 10000
+    money: 200
+    tree: 100
+    rock: 100
   defaultIncome:
     money: 0
     tree: 0
