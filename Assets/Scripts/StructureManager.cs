@@ -60,7 +60,7 @@ public class StructureManager : MonoBehaviour
         }
         uiController.SetInfoPanel(newHouseModel);
         uiController.modifyStructurePanel.SetActive(false);
-        AudioPlayer.instance.PlayPlacementSound();
+        AudioPlayer.instance.PlayUpgradeSound();
     }
 
     public void DestroyHouse()
