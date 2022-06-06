@@ -13,6 +13,8 @@ public class PlacementManager : MonoBehaviour
 
     private Dictionary<Vector3Int, StructureModel> temporaryRoadObjects = new Dictionary<Vector3Int, StructureModel>();
 
+    public Vector3Int currentPos; // For upgrade
+
     private void Awake()
     {
         placementGrid = new Grid(width, height);
@@ -235,6 +237,7 @@ public class PlacementManager : MonoBehaviour
     public void DestroyStructureAt(Vector3Int pos)
     {
         var structure = GetStructureAt(pos);
+        structureDictionary.Remove(pos);
         placementGrid[pos.x, pos.z] = CellType.Empty;
         Destroy(structure.gameObject);
     }

@@ -13,6 +13,7 @@ public class StructureManager : MonoBehaviour
     public PlacementManager placementManager;
     public ResourceManager resourceManager;
     public AIDirector aiDirector;
+    public UIController uiController;
 
     private Dictionary<StructurePrefab, int> structuresQuantityDictionary = new Dictionary<StructurePrefab, int>();
 
@@ -23,30 +24,61 @@ public class StructureManager : MonoBehaviour
                resourceManager.SpendResource(ResourceType.Rock, prefab.resourcesCost.rock);
     }
 
-    public void TryUpgradeHouseToSecondLevel(Vector3Int pos)
+    public void TryUpgradeHouseToNextLevel()
     {
-        var randHouse = UnityEngine.Random.Range(0, houseLvl2Prefabs.Length);
-
-        if (!TrySpendResources(houseLvl2Prefabs[randHouse]))
+        var pos = placementManager.currentPos;
+        var house = placementManager.GetStructureAt(pos);
+        if (house.info.currentPrefab.prefab == house.info.nextLvlPrefab.prefab) 
+            return;
+        var newHousePrefab = house.info.nextLvlPrefab;
+        if (!TrySpendResources(newHousePrefab))
         {
             Debug.Log("Not enough resource!");
             return;
         }
-        
-        IncreaseQuantityOfStructuresDictionary(houseLvl2Prefabs[randHouse]);
-        // DecreaseQuantityOfStructuresDictionary(houseLvl1Prefabs);
-        placementManager.DestroyStructureAt(pos);
-        placementManager.PlaceObjectOnTheMap(pos, houseLvl2Prefabs[randHouse].prefab, CellType.Structure);
-        RotateStructure(pos, houseLvl2Prefabs[randHouse].prefab);
 
-        AudioPlayer.instance.PlayPlacementSound();
+        Debug.Log(house.info.randPos);
         
+        IncreaseQuantityOfStructuresDictionary(newHousePrefab);
+        DestroyHouse();
+        placementManager.PlaceObjectOnTheMap(pos, newHousePrefab.prefab, CellType.Structure);
+        RotateStructure(pos, newHousePrefab.prefab);
+        var newHouseModel = placementManager.GetStructureAt(pos);
+        
+        newHouseModel.info = new StructureInfo
+        {
+            lvl = house.info.lvl + 1,
+            randPos = house.info.randPos,
+            currentIncome = newHousePrefab.resourcesIncome,
+            nextLvlPrefab = newHousePrefab,
+            currentPrefab = newHousePrefab
+        };
+        
+        if (newHouseModel.info.lvl == 2)
+        {
+            newHouseModel.info.nextLvlPrefab = houseLvl3Prefabs[house.info.randPos];
+        }
+        uiController.SetInfoPanel(newHouseModel);
+        uiController.modifyStructurePanel.SetActive(false);
+        AudioPlayer.instance.PlayPlacementSound();
     }
 
-    // private void DecreaseQuantityOfStructuresDictionary(StructurePrefab[] structurePrefabs)
-    // {
-    //     throw new NotImplementedException();
-    // }
+    public void DestroyHouse()
+    {
+        var pos = placementManager.currentPos;
+        var structure = placementManager.GetStructureAt(pos);
+        DecreaseQuantityOfStructuresDictionary(structure.info.currentPrefab);
+        placementManager.DestroyStructureAt(pos);
+    }
+
+    private void DecreaseQuantityOfStructuresDictionary(StructurePrefab prefab)
+    {
+        structuresQuantityDictionary[prefab] -= 1;
+        if (structuresQuantityDictionary[prefab] == 0)
+        {
+            structuresQuantityDictionary.Remove(prefab);
+        }
+    }
 
     public void PlaceHouse(Vector3Int pos)
     {
@@ -66,7 +98,16 @@ public class StructureManager : MonoBehaviour
         placementManager.PlaceObjectOnTheMap(pos, houseLvl1Prefabs[randHouse].prefab, CellType.Structure);
         
         RotateStructure(pos, houseLvl1Prefabs[randHouse].prefab);
-        aiDirector.SpawnRandomCountOfAgents(placementManager.GetStructureAt(pos));
+        var house = placementManager.GetStructureAt(pos);
+        house.info = new StructureInfo
+        {
+            lvl = 1,
+            currentPrefab = houseLvl1Prefabs[randHouse],
+            nextLvlPrefab = houseLvl2Prefabs[randHouse],
+            currentIncome = houseLvl1Prefabs[randHouse].resourcesIncome,
+            randPos = randHouse
+        };
+        aiDirector.SpawnRandomCountOfAgents(house);
 
         AudioPlayer.instance.PlayPlacementSound();
     }
@@ -118,7 +159,6 @@ public class StructureManager : MonoBehaviour
             Debug.Log("There is no tree and rock");
             return;
         }
-
         StructurePrefab specialPrefab;
         if (treeHits.Length > 0 && rockHits.Length > 0)
         {
@@ -140,10 +180,19 @@ public class StructureManager : MonoBehaviour
             Debug.Log("Not enough resource!");
             return;
         }
+        
 
         IncreaseQuantityOfStructuresDictionary(specialPrefab);
 
         placementManager.PlaceObjectOnTheMap(pos, specialPrefab.prefab, CellType.Structure);
+        var special = placementManager.GetStructureAt(pos);
+        special.info = new StructureInfo
+        {
+            currentPrefab = specialPrefab,
+            nextLvlPrefab = specialPrefab,
+            lvl = 1,
+            currentIncome = specialPrefab.resourcesIncome
+        };
         RotateStructure(pos, specialPrefab.prefab);
         AudioPlayer.instance.PlayPlacementSound();
     }

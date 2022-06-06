@@ -7,6 +7,16 @@ using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
 {
+    [Serializable]
+    public struct ResourceTextPair
+    {
+        public ResourceType type;
+        public Text text;
+    }
+    
+    
+    
+    
     public Action OnRoadPlacement, OnHousePlacement, OnSpecialPlacement, OnCloseMenu, OnModifyStructure;
     public Button placeRoadButton, placeHouseButton, placeSpecialButton, closeButton, modifyStructureButton;
 
@@ -17,7 +27,12 @@ public class UIController : MonoBehaviour
     public Color outlineColor;
     private List<Button> buttonList;
 
-    public PlacementManager placementManager; 
+    public PlacementManager placementManager;
+    
+    
+    public List<ResourceTextPair> modifyUpgradeText;
+    public List<ResourceTextPair> modifyIncomeText;
+    public Text currentLvlText;
 
     private void Start()
     {
@@ -74,9 +89,41 @@ public class UIController : MonoBehaviour
     public void SetPanelActive(Vector3Int pos)
     {
         var structure = placementManager.GetStructureAt(pos);
+        placementManager.currentPos = pos;
         if (structure == null) return;
 
         modifyStructurePanel.SetActive(true);
-        // structure
+        
+        SetInfoPanel(structure);
+    }
+
+    public void SetInfoPanel(StructureModel structure)
+    {
+        currentLvlText.text = structure.info.lvl.ToString();
+        foreach (ResourceType type in Enum.GetValues(typeof(ResourceType)))
+        {
+            var incomeText = GetTextByType(modifyIncomeText, type);
+            incomeText.text = structure.info.currentIncome.GetAttr(type).ToString();
+
+            var upgradeText = GetTextByType(modifyUpgradeText, type);
+            upgradeText.text = structure.info.nextLvlPrefab.resourcesCost.GetAttr(type).ToString();
+            if (structure.info.currentPrefab.prefab == structure.info.nextLvlPrefab.prefab)
+            {
+                upgradeText.text = "Maxed out";
+            }
+        }
+    }
+
+    private Text GetTextByType(List<ResourceTextPair> list, ResourceType type)
+    {
+        foreach (var pair in list)
+        {
+            if (pair.type == type)
+            {
+                return pair.text;
+            }
+        }
+
+        return null;
     }
 }

@@ -3,6 +3,7 @@ using UnityEngine;
 public class StructureModel : MonoBehaviour, INeedingRoad
 {
     private float yHeight = 0;
+    public StructureInfo info;
 
     public Vector3Int RoadPosition { get; set; }
 
