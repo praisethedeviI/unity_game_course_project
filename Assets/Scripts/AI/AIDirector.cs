@@ -71,6 +71,7 @@ public class AIDirector : MonoBehaviour
                 agent.transform.SetParent(transform);
                 path.Reverse();
                 var AiAgent = agent.GetComponent<AIAgent>();
+                Debug.Log(AiAgent);
                 AiAgent.aiDirector = this;
 
                 var list = new List<Vector3>();
@@ -88,6 +89,6 @@ public class AIDirector : MonoBehaviour
 
     private GameObject GetRandomPedestrian()
     {
-        return pedestrianPrefabs[UnityEngine.Random.Range(0, pedestrianPrefabs.Length)];
+        return pedestrianPrefabs[Random.Range(0, pedestrianPrefabs.Length)];
     }
 }

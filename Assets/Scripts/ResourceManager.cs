@@ -41,11 +41,17 @@ public class ResourceManager : MonoBehaviour
 
     public void CountIncome(Dictionary<StructurePrefab, int> dict)
     {
+        foreach (ResourceType type in Enum.GetValues(typeof(ResourceType)))
+        {
+
+            incomePerSecond[type] = defaultIncome.GetAttr(type);
+        }
         foreach (var pair in dict)
         {
             foreach (ResourceType type in Enum.GetValues(typeof(ResourceType)))
             {
-                incomePerSecond[type] = defaultIncome.GetAttr(type) + pair.Key.resourcesIncome.GetAttr(type) * pair.Value;
+                
+                incomePerSecond[type] += pair.Key.resourcesIncome.GetAttr(type) * pair.Value;
             }
         }
     }

@@ -34,6 +34,7 @@ public class StructureManager : MonoBehaviour
         }
         
         IncreaseQuantityOfStructuresDictionary(houseLvl2Prefabs[randHouse]);
+        // DecreaseQuantityOfStructuresDictionary(houseLvl1Prefabs);
         placementManager.DestroyStructureAt(pos);
         placementManager.PlaceObjectOnTheMap(pos, houseLvl2Prefabs[randHouse].prefab, CellType.Structure);
         RotateStructure(pos, houseLvl2Prefabs[randHouse].prefab);
@@ -41,6 +42,11 @@ public class StructureManager : MonoBehaviour
         AudioPlayer.instance.PlayPlacementSound();
         
     }
+
+    // private void DecreaseQuantityOfStructuresDictionary(StructurePrefab[] structurePrefabs)
+    // {
+    //     throw new NotImplementedException();
+    // }
 
     public void PlaceHouse(Vector3Int pos)
     {
