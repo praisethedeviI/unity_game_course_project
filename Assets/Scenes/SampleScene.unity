@@ -3747,7 +3747,7 @@ MonoBehaviour:
   houseLvl2Prefabs:
   - resourcesIncome:
       money: 5
-      tree: 1
+      tree: 0
       rock: 0
     resourcesCost:
       money: 200
@@ -3759,7 +3759,7 @@ MonoBehaviour:
     prefab: {fileID: 7535110518046082450, guid: f22441a5e696d5f45aa27c3998817a51, type: 3}
   - resourcesIncome:
       money: 5
-      tree: 1
+      tree: 0
       rock: 0
     resourcesCost:
       money: 200
@@ -3771,7 +3771,7 @@ MonoBehaviour:
     prefab: {fileID: 6029402303299848396, guid: 7ed32184538f0094e944284999009c0c, type: 3}
   - resourcesIncome:
       money: 5
-      tree: 1
+      tree: 0
       rock: 0
     resourcesCost:
       money: 200
@@ -3783,7 +3783,7 @@ MonoBehaviour:
     prefab: {fileID: 4449178977811795308, guid: 87f26a2e5d0fbc74592a727a8e24eb5a, type: 3}
   houseLvl3Prefabs:
   - resourcesIncome:
-      money: 20
+      money: 10
       tree: 0
       rock: 0
     resourcesCost:
@@ -3795,7 +3795,7 @@ MonoBehaviour:
       m_Bits: 0
     prefab: {fileID: 5970580579698405286, guid: 63ce617812633484dbf6b2ec8b9af9ab, type: 3}
   - resourcesIncome:
-      money: 20
+      money: 10
       tree: 0
       rock: 0
     resourcesCost:
@@ -3807,9 +3807,9 @@ MonoBehaviour:
       m_Bits: 0
     prefab: {fileID: 7756260014339248345, guid: 48c578ea43bf8c74298b9b307e9ec199, type: 3}
   - resourcesIncome:
-      money: 500
-      tree: 200
-      rock: 300
+      money: 10
+      tree: 0
+      rock: 0
     resourcesCost:
       money: 500
       tree: 200
@@ -3821,7 +3821,7 @@ MonoBehaviour:
   specialPrefabs:
   - resourcesIncome:
       money: 0
-      tree: 5
+      tree: 2
       rock: 0
     resourcesCost:
       money: 100
@@ -3834,7 +3834,7 @@ MonoBehaviour:
   - resourcesIncome:
       money: 0
       tree: 0
-      rock: 5
+      rock: 2
     resourcesCost:
       money: 100
       tree: 50
